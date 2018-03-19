@@ -12,7 +12,9 @@ from xml.etree import ElementTree
 from typing import List
 
 titlekeyurl = None 
-urlbase = 'https://samurai.ctr.shop.nintendo.net/samurai/ws/{lang}/titles?offset={offs}'
+# urlbase = 'https://samurai.ctr.shop.nintendo.net/samurai/ws/{lang}/titles?offset={offs}'
+urlbase = 'https://samurai.ctr.eshop.nintendo.net/samurai/ws/{lang}/contents?shop_id=1&limit=200&offset={offs}'
+urlbase_ec = 'https://ninja.ctr.shop.nintendo.net/ninja/ws/{lang}/title/{eshop_id}/ec_info?shop_id=1&lang=en'
 
 dumpdest = 'dumped'
 resultdest = 'results'
@@ -27,14 +29,16 @@ csv_missing_titlekeys = resultdest + '/' + 'missing_titlekeys.csv'
 csv_missing_archive_eshop = resultdest + '/' + 'missing_archive_eshop.csv'
 csv_missing_archive_all = resultdest + '/' + 'missing_archive_all.csv'
 
-csv_fieldnames_eshop = ['product_code', 'region_id', 'name', 'publisher', 'publisher_id', 'genre', 'release_eshop', 'release_retail', 'eshop_regions', 'score', 'votes', 'titlekey_known', '3dsdb_id', 'alternative_download', 'alternative_with_titlekey', 'best_alternative']
-csv_fieldnames_3dsdb = ['title_id', 'product_code', 'region_id', 'name', 'publisher', 'region', 'languages', '3dsdb_id', 'alternative_download', 'alternative_with_titlekey', 'best_alternative']
+csv_fieldnames_eshop = ['title_id', 'product_code', 'region_id', 'name', 'publisher', 'publisher_id', 'platform', 'platform_id', 'genre', 'size', 'release_eshop', 'release_retail', 'eshop_regions', 'score', 'votes', 'titlekey_known', '3dsdb_id', 'alternative_download', 'alternative_with_titlekey', 'best_alternative']
+csv_fieldnames_3dsdb = ['title_id', 'product_code', 'region_id', 'name', 'publisher', 'region', 'languages', 'size', '3dsdb_id', 'alternative_download', 'alternative_with_titlekey', 'best_alternative']
 
-langs_english = ('US', 'GB', 'AU')
-langs_main = ('US', 'GB', 'AU', 'JP', 'ES', 'DE', 'IT', 'FR', 'NL', 'KR', 'TW', 'HK')
-langs_all = ('US', 'GB', 'AU', 'JP', 'ES', 'DE', 'IT', 'FR', 'NL', 'AX', 'AF', 'AL', 'DZ', 'AS', 'AD', 'AO', 'AI', 'AQ', 'AG', 'AR', 'AM', 'AW', 'AT', 'AZ', 'BS', 'BH', 'BD', 'BB', 'BY', 'BE', 'BZ', 'BJ', 'BM', 'BT', 'BO', 'BA', 'BW', 'BV', 'BR', 'IO', 'BN', 'BG', 'BF', 'BI', 'KH', 'CM', 'CA', 'CV', 'KY', 'CF', 'TD', 'CL', 'CN', 'CX', 'CC', 'CO', 'KM', 'CD', 'CG', 'CK', 'CR', 'CI', 'HR', 'CU', 'CY', 'CZ', 'DK', 'DJ', 'DM', 'DO', 'EC', 'EG', 'SV', 'GQ', 'ER', 'EE', 'ET', 'FK', 'FO', 'FJ', 'FI', 'GF', 'PF', 'TF', 'GA', 'GM', 'GE', 'GH', 'GI', 'GR', 'GL', 'GD', 'GP', 'GU', 'GT', 'GN', 'GW', 'GY', 'HT', 'HM', 'HN', 'HK', 'HU', 'IS', 'IN', 'ID', 'IR', 'IQ', 'IE', 'IL', 'JM', 'JO', 'KZ', 'KE', 'KI', 'KP', 'KR', 'KW', 'KG', 'LA', 'LV', 'LB', 'LS', 'LR', 'LY', 'LI', 'LT', 'LU', 'MO', 'MK', 'MG', 'MW', 'MY', 'MV', 'ML', 'MT', 'MH', 'MQ', 'MR', 'MU', 'YT', 'MX', 'FM', 'MD', 'MC', 'MN', 'MS', 'MA', 'MZ', 'MM', 'NA', 'NR', 'NP', 'AN', 'NC', 'NZ', 'NI', 'NE', 'NG', 'NU', 'NF', 'MP', 'NO', 'OM', 'PK', 'PW', 'PS', 'PA', 'PG', 'PY', 'PE', 'PH', 'PN', 'PL', 'PT', 'PR', 'QA', 'RE', 'RO', 'RU', 'RW', 'SH', 'KN', 'LC', 'PM', 'VC', 'WS', 'SM', 'ST', 'SA', 'SN', 'CS', 'SC', 'SL', 'SG', 'SK', 'SI', 'SB', 'SO', 'ZA', 'GS', 'LK', 'SD', 'SR', 'SJ', 'SZ', 'SE', 'CH', 'SY', 'TW', 'TJ', 'TZ', 'TH', 'TL', 'TG', 'TK', 'TO', 'TT', 'TN', 'TR', 'TM', 'TC', 'TV', 'UG', 'UA', 'AE', 'UM', 'UY', 'UZ', 'VU', 'VA', 'VE', 'VN', 'VG', 'VI', 'WF', 'EH', 'YE', 'ZM', 'ZW')
+langs_english = ('US', 'GB')
+langs_main = ('US', 'GB', 'JP', 'ES', 'DE', 'IT', 'FR', 'NL', 'KR', 'TW', 'HK')
+langs_all = ('US', 'GB', 'JP', 'ES', 'DE', 'IT', 'FR', 'NL', 'AX', 'AF', 'AL', 'DZ', 'AS', 'AD', 'AO', 'AI', 'AQ', 'AG', 'AR', 'AM', 'AW', 'AT', 'AU', 'AZ', 'BS', 'BH', 'BD', 'BB', 'BY', 'BE', 'BZ', 'BJ', 'BM', 'BT', 'BO', 'BA', 'BW', 'BV', 'BR', 'IO', 'BN', 'BG', 'BF', 'BI', 'KH', 'CM', 'CA', 'CV', 'KY', 'CF', 'TD', 'CL', 'CN', 'CX', 'CC', 'CO', 'KM', 'CD', 'CG', 'CK', 'CR', 'CI', 'HR', 'CU', 'CY', 'CZ', 'DK', 'DJ', 'DM', 'DO', 'EC', 'EG', 'SV', 'GQ', 'ER', 'EE', 'ET', 'FK', 'FO', 'FJ', 'FI', 'GF', 'PF', 'TF', 'GA', 'GM', 'GE', 'GH', 'GI', 'GR', 'GL', 'GD', 'GP', 'GU', 'GT', 'GN', 'GW', 'GY', 'HT', 'HM', 'HN', 'HK', 'HU', 'IS', 'IN', 'ID', 'IR', 'IQ', 'IE', 'IL', 'JM', 'JO', 'KZ', 'KE', 'KI', 'KP', 'KR', 'KW', 'KG', 'LA', 'LV', 'LB', 'LS', 'LR', 'LY', 'LI', 'LT', 'LU', 'MO', 'MK', 'MG', 'MW', 'MY', 'MV', 'ML', 'MT', 'MH', 'MQ', 'MR', 'MU', 'YT', 'MX', 'FM', 'MD', 'MC', 'MN', 'MS', 'MA', 'MZ', 'MM', 'NA', 'NR', 'NP', 'AN', 'NC', 'NZ', 'NI', 'NE', 'NG', 'NU', 'NF', 'MP', 'NO', 'OM', 'PK', 'PW', 'PS', 'PA', 'PG', 'PY', 'PE', 'PH', 'PN', 'PL', 'PT', 'PR', 'QA', 'RE', 'RO', 'RU', 'RW', 'SH', 'KN', 'LC', 'PM', 'VC', 'WS', 'SM', 'ST', 'SA', 'SN', 'CS', 'SC', 'SL', 'SG', 'SK', 'SI', 'SB', 'SO', 'ZA', 'GS', 'LK', 'SD', 'SR', 'SJ', 'SZ', 'SE', 'CH', 'SY', 'TW', 'TJ', 'TZ', 'TH', 'TL', 'TG', 'TK', 'TO', 'TT', 'TN', 'TR', 'TM', 'TC', 'TV', 'UG', 'UA', 'AE', 'UM', 'UY', 'UZ', 'VU', 'VA', 'VE', 'VN', 'VG', 'VI', 'WF', 'EH', 'YE', 'ZM', 'ZW')
 
-region_id_pref = {'A' : 0, 'P' : 1, 'E' : 2, 'J' : 3, 'S' : 4, 'D' : 5, 'F' : 6, 'I' : 7, 'H' : 8, 'R' : 9, 'W' : 10, 'K' : 11, 'V' : 12, 'X' : 13, 'Y' : 14, 'Z' : 15 }
+platform_dict = {'18' : 'Nintendo 3DS Retail Only', '19' : 'Nintendo 3DS Download Only', '20' : 'Nintendo DSiWare', '21' : 'Nintendo Game Boy', '22' : 'Nintendo Game Boy Color', '23' : 'Nintendo Game Boy Advance', '24' : 'NES', '25' : 'Game Gear', '26' : 'Turbografx', '43' : 'Downloadable Video', '63' : 'Nintendo 3DS Software Update', '83' : 'Nintendo 3DS Software Update (JP)', '103' : 'Nintendo 3DS Retail/Download', '1001' : 'New 3DS Download Only', '1002' : 'New 3DS Retail/Download', '1003' : 'New 3DS Software Update', '1004' : 'Super Nintendo'}
+
+region_id_pref = {'A' : 0, 'P' : 1, 'E' : 2, 'J' : 3, 'S' : 4, 'D' : 5, 'F' : 6, 'I' : 7, 'H' : 8, 'R' : 9, 'W' : 10, 'K' : 11, 'V' : 12, 'X' : 13, 'Y' : 14, 'Z' : 15, 'T' : 16, 'O' : 17, 'U' : 18}
 
 merged_eshop_elements = []
 db_release_elements = []
@@ -57,6 +61,37 @@ def write_eshop_content(el, out):
     # save to file
     merged = ElementTree.ElementTree(merged_root)
     merged.write(out)
+
+
+def add_eshop_ec_info():
+    with requests.session() as s:
+        s.verify=False
+        s.cert=('ctr-common-1.crt', 'ctr-common-1.key')
+        
+        count_all = len(merged_eshop_elements)
+        count_ok = 0
+        for cn in merged_eshop_elements:
+            eid = cn.find('title').get('id')
+            lng = 'US'
+            er = cn.find('eshop_regions')
+            for l in langs:
+                if er.find(l).text == 'true':
+                    lng = l
+                    break
+
+            url = urlbase_ec.format(lang=lng, eshop_id=eid)
+            try:
+                with s.get(url) as r:
+                    el = ElementTree.fromstring(r.content)
+                    data_root = list(el)[0]
+                    cn.insert(1, data_root)#
+            except OSError:
+                return
+
+            count_ok += 1
+            print('Adding eshop ecommerce info: ' + str(count_ok) + ' / ' + str(count_all) + ' entries', end = '\r')
+
+        print('Adding eshop ecommerce info: ' + str(count_ok) + ' / ' + str(count_all) + ' entries', end = '\n')
 
 
 def merge_eshop_content(cn, pc, l):
@@ -161,7 +196,10 @@ def merge_eshop_content(cn, pc, l):
 def get_eshop_content():
     # handle eshop content
     with requests.session() as s:
+        s.verify = False
+
         for l in langs:
+            print('Scraping ' + l + ' eshop content: ...', end = '\r')
             count_ok = 0
             count_new = 0
             offset = 0
@@ -169,7 +207,7 @@ def get_eshop_content():
             while True:
                 url = urlbase.format(lang=l, offs=offset)
                 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-                with s.get(url, verify=False) as r:
+                with s.get(url) as r:
                 # with s.get(url, verify='nintendo-ca-g3.pem') as r:
                     el = ElementTree.fromstring(r.content)
                     # check this eshop
@@ -189,9 +227,10 @@ def get_eshop_content():
 
                     # clean up and add elements from the contents root to the title_elements lists
                     for cn in contents_root:
-                        pc = cn.find('title').find('product_code').text
-                        if not pc.startswith(('CTR-', 'KTR-')):
+                        tt = cn.find('title')
+                        if tt is None:
                             continue
+                        pc = tt.find('product_code').text
                         title_elements.append(cn)
 
                         # merge eshope content
@@ -206,6 +245,7 @@ def get_eshop_content():
                 write_eshop_content(title_elements, out)
 
     # save merged data to file
+    add_eshop_ec_info()
     out = dumpdest + '/contents-eshop-MERGED.xml'
     write_eshop_content(merged_eshop_elements, out)
 
@@ -308,13 +348,14 @@ def analyse_3dsdb(english_only):
                         eshop_alt_ttk.append(pc)
 
             best_alt = ''
-            ba_pref = region_id_pref[rid]
-            if ba_pref is not None:
+            if rid in region_id_pref:
+                ba_pref = region_id_pref[rid]
                 for a in eshop_alt:
-                    ba_pref0 = region_id_pref[a[9:10]]
-                    if ba_pref0 is not None and ba_pref0 < ba_pref:
-                        ba_pref = ba_pref0
-                        best_alt = a
+                    if a[9:10] in region_id_pref:
+                        ba_pref0 = region_id_pref[a[9:10]]
+                        if ba_pref0 < ba_pref:
+                            ba_pref = ba_pref0
+                            best_alt = a
 
             title_id = rl.find('titleid').text
             region = rl.find('region').text
@@ -322,11 +363,12 @@ def analyse_3dsdb(english_only):
             name = rl.find('name').text
             pub = rl.find('publisher').text
             dbid = rl.find('id').text
+            size = rl.find('trimmedsize').text
 
             if not found:
-                mdw.writerow({'title_id': title_id, 'product_code': pc_p, 'region_id': rid, 'name': name, 'publisher': pub, 'region': region, 'languages': lang, '3dsdb_id': dbid, 'alternative_download': ' / '.join(eshop_alt), 'alternative_with_titlekey': ' / '.join(eshop_alt_ttk), 'best_alternative': best_alt})
+                mdw.writerow({'title_id': title_id, 'product_code': pc_p, 'region_id': rid, 'name': name, 'publisher': pub, 'region': region, 'languages': lang, 'size': size, '3dsdb_id': dbid, 'alternative_download': ' / '.join(eshop_alt), 'alternative_with_titlekey': ' / '.join(eshop_alt_ttk), 'best_alternative': best_alt})
                 count_missing += 1
-            dbw.writerow({'title_id': title_id, 'product_code': pc_p, 'region_id': rid, 'name': name, 'publisher': pub, 'region': region, 'languages': lang, '3dsdb_id': dbid, 'alternative_download': ' / '.join(eshop_alt), 'alternative_with_titlekey': ' / '.join(eshop_alt_ttk), 'best_alternative': best_alt})
+            dbw.writerow({'title_id': title_id, 'product_code': pc_p, 'region_id': rid, 'name': name, 'publisher': pub, 'region': region, 'languages': lang, 'size': size, '3dsdb_id': dbid, 'alternative_download': ' / '.join(eshop_alt), 'alternative_with_titlekey': ' / '.join(eshop_alt_ttk), 'best_alternative': best_alt})
 
         print('Adding missing entries from 3dsdb.com: ' + str(count_missing) + ' / ' + str(count_all) + ' entries', end = '\n')
 
@@ -347,9 +389,11 @@ def build_eshop_analysis():
             pub = tt.find('publisher')
             sr = tt.find('star_rating_info')
             es = cn.find('eshop_regions')
+            ec = cn.find('title_ec_info')
 
             pc = tt.find('product_code').text
             rid = pc[9:10]
+            pid = pl.get('id')
             name = tt.find('name').text
             genre = tt.find('display_genre').text
             pub_name = pub.find('name').text
@@ -402,15 +446,27 @@ def build_eshop_analysis():
                         eshop_alt_ttk.append(pc0)
 
             best_alt = ''
-            ba_pref = region_id_pref[rid]
-            if ba_pref is not None:
+            if rid in region_id_pref:
+                ba_pref = region_id_pref[rid]
                 for a in eshop_alt:
-                    ba_pref0 = region_id_pref[a[9:10]]
-                    if ba_pref0 is not None and ba_pref0 < ba_pref:
-                        ba_pref = ba_pref0
-                        best_alt = a
+                    if a[9:10] in region_id_pref:
+                        ba_pref0 = region_id_pref[a[9:10]]
+                        if ba_pref0 < ba_pref:
+                            ba_pref = ba_pref0
+                            best_alt = a
 
-            eaw.writerow({'product_code': pc, 'region_id': rid, 'name': name, 'publisher': pub_name, 'publisher_id': pub_id, 'genre': genre, 'release_eshop': rel_e, 'release_retail': rel_r, 'eshop_regions': '/'.join(eshop_regs), 'score': score, 'votes': votes, 'titlekey_known': titlekey_known, '3dsdb_id': dbid, 'alternative_download': ' / '.join(eshop_alt), 'alternative_with_titlekey': ' / '.join(eshop_alt_ttk), 'best_alternative': best_alt})
+            platform = platform_dict[pid]
+            if platform is None:
+                platform = ''
+
+            title_id = ''
+            size = '0'
+            if ec is not None:
+                title_id = ec.find('title_id').text
+                if ec.find('content_size') is not None:
+                    size = ec.find('content_size').text
+
+            eaw.writerow({'title_id': title_id, 'product_code': pc, 'region_id': rid, 'name': name, 'publisher': pub_name, 'publisher_id': pub_id, 'platform': platform, 'platform_id' : pid, 'genre': genre, 'size': size, 'release_eshop': rel_e, 'release_retail': rel_r, 'eshop_regions': '/'.join(eshop_regs), 'score': score, 'votes': votes, 'titlekey_known': titlekey_known, '3dsdb_id': dbid, 'alternative_download': ' / '.join(eshop_alt), 'alternative_with_titlekey': ' / '.join(eshop_alt_ttk), 'best_alternative': best_alt})
             count_ok += 1
 
         # append data from 3DSDB
@@ -418,7 +474,7 @@ def build_eshop_analysis():
             mdr = csv.DictReader(md_csv)
             for r in mdr:
                 print('Merging all entries: ' + str(count_ok) + ' / ' + str(count_all) + ' entries', end = '\r')
-                eaw.writerow({'product_code': r['product_code'], 'region_id': r['region_id'], 'name': r['name'], 'publisher': r['publisher'], 'release_retail': '3DSDB', '3dsdb_id': r['3dsdb_id'], 'alternative_download': r['alternative_download'], 'alternative_with_titlekey': r['alternative_with_titlekey'], 'best_alternative': r['best_alternative']})
+                eaw.writerow({'title_id': r['title_id'], 'product_code': r['product_code'], 'region_id': r['region_id'], 'name': r['name'], 'publisher': r['publisher'], 'platform': platform_dict['18'], 'platform_id': '18', 'size': r['size'], 'release_retail': '3DSDB', '3dsdb_id': r['3dsdb_id'], 'alternative_download': r['alternative_download'], 'alternative_with_titlekey': r['alternative_with_titlekey'], 'best_alternative': r['best_alternative']})
                 count_ok += 1
                 count_all += 1
 
@@ -495,7 +551,7 @@ def analyse_missing():
         print('Analysis summary:')
         print('--------------------------------')
 
-        print('Total titles processed         :', str(count_all))
+        print('Total titles found             :', str(count_all))
         print('Unique download titles         :', str(n_unique_downloads))
         if titlekeyurl:
             print('Titles with missing titlekeys  :', str(m_titlekey))
@@ -535,7 +591,7 @@ if __name__ == '__main__':
         langs.append(args.region)
         english_only = True
 
-    if args.titlekeyurl:
+    if not titlekeyurl and args.titlekeyurl:
         titlekeyurl = args.titlekeyurl
 
     # make dirs for data
